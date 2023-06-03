@@ -882,7 +882,8 @@ def local_to_global_space(
     cam_pose = cam_pose.to(dtype=torch.float32)
   # Rotate yaw along y-axis
   yaw = cam_pose[..., 2] # (b,)
-  points = utils.rotate(points, [0., 1., 0.], yaw)
+  batch_size = 1 if len(points.shape) < 2 else points.shape[0]
+  points = utils.rotate(points, [0., 1., 0.] * batch_size, yaw)
   zeros = torch.zeros_like(yaw)
   x = cam_pose[..., 0]
   y = zeros
@@ -936,7 +937,8 @@ def global_to_local_space(
   pos = torch.stack((x, y, z), dim=-1) # (b, 3)
   points = utils.translate(points, -pos)
   # Rotate `yaw` angle along y-aixs
-  points = utils.rotate(points, [0., 1., 0.], -yaw)
+  batch_size = 1 if len(points.shape) < 2 else points.shape[0]
+  points = utils.rotate(points, [0., 1., 0.] * batch_size, -yaw)
   if _validate_args:
     points = points.view(orig_shape)
   return points
