@@ -882,8 +882,8 @@ def local_to_global_space(
     cam_pose = cam_pose.to(dtype=torch.float32)
   # Rotate yaw along y-axis
   yaw = cam_pose[..., 2] # (b,)
-  batch_size = 1 if len(points.shape) < 2 else points.shape[0]
-  points = utils.rotate(points, [0., 1., 0.] * batch_size, yaw)
+  b = 1 if len(points.shape) < 2 else points.shape[0]
+  points = utils.rotate(points, [0., 1., 0.] * batch, yaw)
   zeros = torch.zeros_like(yaw)
   x = cam_pose[..., 0]
   y = zeros
@@ -937,8 +937,8 @@ def global_to_local_space(
   pos = torch.stack((x, y, z), dim=-1) # (b, 3)
   points = utils.translate(points, -pos)
   # Rotate `yaw` angle along y-aixs
-  batch_size = 1 if len(points.shape) < 2 else points.shape[0]
-  points = utils.rotate(points, [0., 1., 0.] * batch_size, -yaw)
+  b = 1 if len(points.shape) < 2 else points.shape[0]
+  points = utils.rotate(points, [0., 1., 0.] * batch, -yaw)
   if _validate_args:
     points = points.view(orig_shape)
   return points
@@ -1833,7 +1833,8 @@ class TopdownMap():
         (b, 2). torch.int64
     """
     # The camera a.k.a. local origin is at (0, 0, 0)
-    cam_pos = torch.zeros((3,), dtype=torch.float32)
+    b = self.topdown_map.shape[0]
+    cam_pos = torch.zeros((b, 1, 3), dtype=torch.float32)
     cam_pos = self.get_coords(
       points = cam_pos,
       is_global = False
@@ -1850,7 +1851,8 @@ class TopdownMap():
         (b, 2). torch.int64
     """
     # The global origin is at (0, 0, 0)
-    origin_pos = torch.zeros((3,), dtype=torch.float32)
+    b = self.topdown_map.shape[0]
+    origin_pos = torch.zeros((b, 1, 3), dtype=torch.float32)
     origin_pos = self.get_coords(
       points = origin_pos,
       is_global = True
