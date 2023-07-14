@@ -3,7 +3,7 @@ import math
 import random
 
 import cv2
-
+import examples.vis as vis
 # --- 3rd party ---
 import numpy as np
 import pyastar
@@ -12,11 +12,9 @@ import torch
 
 # --- my module ---
 import dungeon_maps as dmap
-
 # import simulators, so that one can use dmap.sim.make()
 # to create simulators.
 import dungeon_maps.sim
-import vis
 from dungeon_maps.topdown_mapper import TopDownMapper
 
 # Some constants
